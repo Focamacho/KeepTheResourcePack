@@ -7,5 +7,5 @@ Not everyone has a beefy PC, so having resourcepacks loading when you are bootin
 Without this Mod everytime that you log in a server:
 (imagem mt dahora de pessoa clicando pra loadar uma textura aqui)
 
-With this Mod everytime that you log in a server?
+With this Mod everytime that you log in a server:
 (gif mt dahora de pessoa entrando sem loadar uma textura aqui)
