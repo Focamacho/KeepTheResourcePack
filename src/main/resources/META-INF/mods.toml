@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="MIT"
+[[mods]]
+modId="keeptheresourcepack"
+version="${file.jarVersion}"
+displayName="KeepTheResourcePack"
+authors="Focamacho"
+description='''
+Keep the Resource Pack loaded even after leaving the server.
+'''

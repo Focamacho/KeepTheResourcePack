@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.focamacho.keeptheresourcepack.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "keeptheresourcepack.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "MixinDownloadingPackFinder"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
