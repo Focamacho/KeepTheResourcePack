@@ -11,7 +11,7 @@ import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -26,13 +26,13 @@ import java.util.concurrent.locks.ReentrantLock;
 @Mixin(ClientPackSource.class)
 public abstract class MixinDownloadingPackFinder {
 
-    @Shadow @Final private static Logger LOGGER;
-
     @Shadow @Nullable private Pack serverPack;
 
     @Shadow @Final private ReentrantLock downloadLock;
 
     @Shadow @Nullable private CompletableFuture<?> currentDownload;
+
+    @Shadow @Final private static Logger LOGGER;
 
     /**
      * @author KeepTheResourcePack

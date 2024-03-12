@@ -15,12 +15,12 @@ apply plugin: 'org.spongepowered.mixin'
 
 group = 'com.focamacho'
 version = '1.0'
-archivesBaseName = 'KeepTheResourcePack-1.17.1'
+archivesBaseName = 'KeepTheResourcePack-1.18.2'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'official', version: '1.17.1'
+    mappings channel: 'official', version: '1.18.2'
 
     runs {
         client {
@@ -85,7 +85,7 @@ mixin {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.2.17'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
