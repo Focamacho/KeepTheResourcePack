@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'com.focamacho'
-version = '1.0'
+version = '1.0.1'
 archivesBaseName = 'KeepTheResourcePack-1.16.5'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
