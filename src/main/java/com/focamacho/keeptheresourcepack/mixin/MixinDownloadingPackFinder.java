@@ -71,7 +71,7 @@ public abstract class MixinDownloadingPackFinder {
         CompletableFuture<Void> returnValue = null;
         if(this.serverPack == null || !fileIn.equals(KeepTheResourcePack.cacheResourcePackFile)) {
             this.serverPack = newServerPack;
-            if(!KeepTheResourcePack.cacheResourcePackFile.equals(fileIn)) {
+            if(!fileIn.equals(KeepTheResourcePack.cacheResourcePackFile)) {
                 KeepTheResourcePack.setLatestServerResourcePack(fileIn);
                 returnValue = Minecraft.getInstance().scheduleResourcesRefresh();
             }
