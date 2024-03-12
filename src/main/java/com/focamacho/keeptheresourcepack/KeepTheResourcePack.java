@@ -26,7 +26,7 @@ public class KeepTheResourcePack {
 
                 if(resourcePack.exists()) {
                     cacheResourcePackFile = resourcePack;
-                    Minecraft.getInstance().getClientPackSource().setServerPack(resourcePack, PackSource.SERVER);
+                    Minecraft.getInstance().getDownloadedPackSource().setServerPack(resourcePack, PackSource.SERVER);
                 }
                 else setLatestServerResourcePack(null);
             } catch (IOException e) { e.printStackTrace(); }
