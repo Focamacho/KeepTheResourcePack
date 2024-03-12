@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -15,19 +15,21 @@ apply plugin: 'org.spongepowered.mixin'
 
 group = 'com.focamacho'
 version = '1.0'
-archivesBaseName = 'KeepTheResourcePack-1.16.5'
+archivesBaseName = 'KeepTheResourcePack-1.17.1'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'official', version: '1.17.1'
 
     runs {
         client {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             arg "-mixin.config=keeptheresourcepack.mixins.json"
 
@@ -41,8 +43,10 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             arg "-mixin.config=keeptheresourcepack.mixins.json"
 
@@ -56,10 +60,13 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            args '--mod', 'keeptheresourcepack', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'keeptheresourcepack', '--all', '--output', file('src/generated/resources/')
+            arg "-mixin.config=keeptheresourcepack.mixins.json"
 
             mods {
                 keeptheresourcepack {
@@ -68,6 +75,7 @@ minecraft {
             }
         }
     }
+
 }
 
 mixin {
@@ -77,19 +85,19 @@ mixin {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.1.32'
-    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
     manifest {
         attributes([
                 "Specification-Title"     : "keeptheresourcepack",
-                "Specification-Vendor"    : "Focamacho",
+                "Specification-Vendor"    : "focamacho",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.version,
-                "Implementation-Vendor"   : "Focamacho",
+                "Implementation-Vendor"   : "focamacho",
                 "MixinConfigs"            : "keeptheresourcepack.mixins.json",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])

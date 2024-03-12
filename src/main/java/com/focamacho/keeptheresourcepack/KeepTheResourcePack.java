@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.IPackNameDecorator;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
@@ -26,7 +26,7 @@ public class KeepTheResourcePack {
 
                 if(resourcePack.exists()) {
                     cacheResourcePackFile = resourcePack;
-                    Minecraft.getInstance().getPackFinder().setServerPack(resourcePack, IPackNameDecorator.SERVER);
+                    Minecraft.getInstance().getClientPackSource().setServerPack(resourcePack, PackSource.SERVER);
                 }
                 else setLatestServerResourcePack(null);
             } catch (IOException e) { e.printStackTrace(); }

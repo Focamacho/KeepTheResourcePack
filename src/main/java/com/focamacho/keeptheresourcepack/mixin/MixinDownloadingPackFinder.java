@@ -1,15 +1,16 @@
 package com.focamacho.keeptheresourcepack.mixin;
 
 import com.focamacho.keeptheresourcepack.KeepTheResourcePack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.DownloadingPackFinder;
-import net.minecraft.resources.FilePack;
-import net.minecraft.resources.IPackNameDecorator;
-import net.minecraft.resources.PackCompatibility;
-import net.minecraft.resources.ResourcePackInfo;
-import net.minecraft.resources.data.PackMetadataSection;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.resources.ClientPackSource;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.packs.FilePackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
+import net.minecraft.server.packs.repository.PackSource;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,24 +23,24 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Mixin(DownloadingPackFinder.class)
+@Mixin(ClientPackSource.class)
 public abstract class MixinDownloadingPackFinder {
-
-    @Shadow @Final private ReentrantLock lockDownload;
-
-    @Shadow @Nullable private CompletableFuture<?> currentDownload;
 
     @Shadow @Final private static Logger LOGGER;
 
-    @Shadow @Nullable private ResourcePackInfo serverPack;
+    @Shadow @Nullable private Pack serverPack;
+
+    @Shadow @Final private ReentrantLock downloadLock;
+
+    @Shadow @Nullable private CompletableFuture<?> currentDownload;
 
     /**
      * @author KeepTheResourcePack
      * @reason Keep the Resource Pack loaded even after leaving the server.
      */
     @Overwrite
-    public void clearResourcePack() {
-        this.lockDownload.lock();
+    public void clearServerPack() {
+        this.downloadLock.lock();
 
         try {
             if (this.currentDownload != null) {
@@ -48,7 +49,7 @@ public abstract class MixinDownloadingPackFinder {
 
             this.currentDownload = null;
         } finally {
-            this.lockDownload.unlock();
+            this.downloadLock.unlock();
         }
     }
 
@@ -57,23 +58,37 @@ public abstract class MixinDownloadingPackFinder {
      * @reason Keep the Resource Pack loaded even after leaving the server.
      */
     @Overwrite
-    public CompletableFuture<Void> setServerPack(File fileIn, IPackNameDecorator p_217816_2_) {
+    public CompletableFuture<Void> setServerPack(File fileIn, PackSource source) {
         PackMetadataSection packmetadatasection;
-        try (FilePack filepack = new FilePack(fileIn)) {
-            packmetadatasection = filepack.getMetadata(PackMetadataSection.SERIALIZER);
+        try {
+            FilePackResources filepackresources = new FilePackResources(fileIn);
+
+            try {
+                packmetadatasection = filepackresources.getMetadataSection(PackMetadataSection.SERIALIZER);
+            } catch (Throwable throwable1) {
+                try {
+                    filepackresources.close();
+                } catch (Throwable throwable) {
+                    throwable1.addSuppressed(throwable);
+                }
+
+                throw throwable1;
+            }
+
+            filepackresources.close();
         } catch (IOException ioexception) {
-            return Util.completedExceptionallyFuture(new IOException(String.format("Invalid resourcepack at %s", fileIn), ioexception));
+            return Util.failedFuture(new IOException(String.format("Invalid resourcepack at %s", fileIn), ioexception));
         }
 
         LOGGER.info("Applying server pack {}", fileIn);
-        ResourcePackInfo newServerPack = new ResourcePackInfo("server", true, () -> new FilePack(fileIn), new TranslationTextComponent("resourcePack.server.name"), packmetadatasection.getDescription(), PackCompatibility.getCompatibility(packmetadatasection.getPackFormat()), ResourcePackInfo.Priority.TOP, true, p_217816_2_);
 
+        Pack newServerPack = new Pack("server", true, () -> new FilePackResources(fileIn), new TranslatableComponent("resourcePack.server.name"), packmetadatasection.getDescription(), PackCompatibility.forMetadata(packmetadatasection, PackType.CLIENT_RESOURCES), Pack.Position.TOP, true, source);
         CompletableFuture<Void> returnValue = null;
         if(this.serverPack == null || !fileIn.equals(KeepTheResourcePack.cacheResourcePackFile)) {
             this.serverPack = newServerPack;
-            if(!KeepTheResourcePack.cacheResourcePackFile.equals(fileIn)) {
+            if(!fileIn.equals(KeepTheResourcePack.cacheResourcePackFile)) {
                 KeepTheResourcePack.setLatestServerResourcePack(fileIn);
-                returnValue = Minecraft.getInstance().scheduleResourcesRefresh();
+                returnValue = Minecraft.getInstance().delayTextureReload();
             }
         }
 
