@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.ClientPackSource;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.packs.FilePackResources;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -81,7 +82,7 @@ public abstract class MixinDownloadingPackFinder {
 
         LOGGER.info("Applying server pack {}", fileIn);
 
-        Pack newServerPack = new Pack("server", true, () -> new FilePackResources(fileIn), new TranslatableComponent("resourcePack.server.name"), packmetadatasection.getDescription(), PackCompatibility.forFormat(packmetadatasection.getPackFormat()), Pack.Position.TOP, true, source);
+        Pack newServerPack = new Pack("server", true, () -> new FilePackResources(fileIn), new TranslatableComponent("resourcePack.server.name"), packmetadatasection.getDescription(), PackCompatibility.forMetadata(packmetadatasection, PackType.CLIENT_RESOURCES), Pack.Position.TOP, true, source);
         CompletableFuture<Void> returnValue = null;
         if(this.serverPack == null || !fileIn.equals(KeepTheResourcePackClient.cacheResourcePackFile)) {
             this.serverPack = newServerPack;
