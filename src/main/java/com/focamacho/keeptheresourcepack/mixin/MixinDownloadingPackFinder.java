@@ -1,6 +1,7 @@
 package com.focamacho.keeptheresourcepack.mixin;
 
 import com.focamacho.keeptheresourcepack.KeepTheResourcePack;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DownloadedPackSource;
 import net.minecraft.network.chat.Component;
@@ -61,14 +62,15 @@ public abstract class MixinDownloadingPackFinder {
      */
     @Overwrite
     public CompletableFuture<Void> setServerPack(File fileIn, PackSource source) {
-        Pack.ResourcesSupplier pack$resourcessupplier = (p_255464_) -> new FilePackResources(p_255464_, fileIn, false);
-        Pack.Info pack$info = Pack.readPackInfo("server", pack$resourcessupplier);
+        Pack.ResourcesSupplier pack$resourcessupplier = new FilePackResources.FileResourcesSupplier(fileIn, false);
+        int i = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES);
+        Pack.Info pack$info = Pack.readPackInfo("server", pack$resourcessupplier, i);
         if (pack$info == null) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid pack metadata at " + fileIn));
         } else {
             LOGGER.info("Applying server pack {}", fileIn);
 
-            Pack newServerPack = Pack.create("server", SERVER_NAME, true, pack$resourcessupplier, pack$info, PackType.CLIENT_RESOURCES, Pack.Position.TOP, true, source);
+            Pack newServerPack = Pack.create("server", SERVER_NAME, true, pack$resourcessupplier, pack$info, Pack.Position.TOP, true, source);
             CompletableFuture<Void> returnValue = null;
             if(this.serverPack == null || !fileIn.equals(KeepTheResourcePack.cacheResourcePackFile)) {
                 this.serverPack = newServerPack;
